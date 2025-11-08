@@ -87,18 +87,18 @@
 
         function WeekScheduler() {
             const [tasks, setTasks] = useState({});
-            const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+            const [selectedDay, setSelectedDay] = useState((new Date().getDay() + 6) % 7 || 7);
             const [newTask, setNewTask] = useState({ title: '', time: '', description: '' });
             const [isAdding, setIsAdding] = useState(false);
 
             const days = [
-                { id: 0, name: 'Sunday', short: 'Sun' },
                 { id: 1, name: 'Monday', short: 'Mon' },
                 { id: 2, name: 'Tuesday', short: 'Tue' },
                 { id: 3, name: 'Wednesday', short: 'Wed' },
                 { id: 4, name: 'Thursday', short: 'Thu' },
                 { id: 5, name: 'Friday', short: 'Fri' },
                 { id: 6, name: 'Saturday', short: 'Sat' }
+                { id: 7, name: 'Sunday', short: 'Sun' }
             ];
 
             useEffect(() => {
@@ -186,7 +186,7 @@
                         <div className="grid grid-cols-7 gap-2 mb-8">
                             {days.map(day => {
                                 const dayTaskCount = (tasks[day.id] || []).length;
-                                const isToday = day.id === new Date().getDay();
+                                const isToday = day.id === ((new Date().getDay() + 6) % 7 || 7);
                                 const isSelected = day.id === selectedDay;
                                 
                                 return (
