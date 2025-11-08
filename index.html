@@ -3,357 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6B21A8">
-    <meta name="description" content="Plan your week, stay organized with this beautiful weekly scheduler">
-    <title>Weekly Scheduler</title>
+    <meta name="theme-color" content="#581c87">
+    <meta name="description" content="A beautiful weekly planner with dark neon purple theme">
+    <title>Weekly Planner</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAVlJREFUWEftl7FKA0EQhv+ZC4iNjWBhYWFjI2hjYWFhZWEhKFgIgmBhYSFYWFhYWFjYWFhY2AgWFhYWFhYWFjZCECy8N7PDbbK72dskF0GbNJfb2W/+nZ3ZJfAfF/3H+jEAXkEkBwDaALQA7AI4BnCiqo9/AuASgDMAswA6ADwCuABwA+AOwK2qfk4E4BJYBbAEYB7AHIBZANsAVgBsAjhR1c+xAVwCywD2AewAaAHYAHAEYAnAFoCjfxHoAlgFcBxOXgLQBLDuEgi7rwM4UNW3kQGuAVsXAM4BrAE4DAnY7tsATlX1Y2iAa8CWzf4AwC2AQwDnAM4AHAO4UtXPgQGuAVsWgDXgEsCFqp6F3S8DsFXXgJUDuAZsWQAWgD0AF4EFW3UNWDmAa8CWBWBPcBd2twCsAbs/NWDlAK4BW7thdwvAAjgJz9EqACtX9iesBKCuR1UO8A3bUDYhz/JjVAAAAABJRU5ErkJggg==">
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        * { box-sizing: border-box; }
-        input[type="time"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.3; }
+        }
+        .animate-pulse-custom {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-
-    <script type="text/babel">
+    <div id="app"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <script>
         const { useState, useEffect } = React;
-
-        // Lucide React Icons as components
-        const Plus = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
+        
+        // Icons
+        const Plus = () => React.createElement('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+            React.createElement('line', { x1: 12, y1: 5, x2: 12, y2: 19 }),
+            React.createElement('line', { x1: 5, y1: 12, x2: 19, y2: 12 })
+        );
+        
+        const X = () => React.createElement('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+            React.createElement('line', { x1: 18, y1: 6, x2: 6, y2: 18 }),
+            React.createElement('line', { x1: 6, y1: 6, x2: 18, y2: 18 })
+        );
+        
+        const Clock = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
+            React.createElement('polyline', { points: '12 6 12 12 16 14' })
+        );
+        
+        const AlignLeft = () => React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+            React.createElement('line', { x1: 17, y1: 10, x2: 3, y2: 10 }),
+            React.createElement('line', { x1: 21, y1: 6, x2: 3, y2: 6 }),
+            React.createElement('line', { x1: 21, y1: 14, x2: 3, y2: 14 }),
+            React.createElement('line', { x1: 17, y1: 18, x2: 3, y2: 18 })
         );
 
-        const Trash2 = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-        );
-
-        const Clock = () => (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-        );
-
-        const Calendar = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-        );
-
-        const Check = () => (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-        );
-
-        // Storage API simulation using localStorage
-        const storage = {
-            get: (key) => {
-                return new Promise((resolve) => {
-                    const value = localStorage.getItem(key);
-                    if (value) {
-                        resolve({ key, value });
-                    } else {
-                        resolve(null);
-                    }
-                });
-            },
-            set: (key, value) => {
-                return new Promise((resolve) => {
-                    localStorage.setItem(key, value);
-                    resolve({ key, value });
-                });
-            }
-        };
-
-        function WeekScheduler() {
-            const [tasks, setTasks] = useState({});
-            const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+        function WeeklyPlanner() {
+            const [tasks, setTasks] = useState(() => {
+                const saved = localStorage.getItem('weeklyPlannerTasks');
+                return saved ? JSON.parse(saved) : {};
+            });
+            const [showModal, setShowModal] = useState(false);
+            const [currentDayIndex, setCurrentDayIndex] = useState(0);
             const [newTask, setNewTask] = useState({ title: '', time: '', description: '' });
-            const [isAdding, setIsAdding] = useState(false);
 
-            const days = [
-                { id: 0, name: 'Sunday', short: 'Sun' },
-                { id: 1, name: 'Monday', short: 'Mon' },
-                { id: 2, name: 'Tuesday', short: 'Tue' },
-                { id: 3, name: 'Wednesday', short: 'Wed' },
-                { id: 4, name: 'Thursday', short: 'Thu' },
-                { id: 5, name: 'Friday', short: 'Fri' },
-                { id: 6, name: 'Saturday', short: 'Sat' }
-            ];
+            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            
+            const getCurrentDay = () => {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const today = new Date().getDay();
+                return days[today];
+            };
+
+            const currentDay = getCurrentDay();
+            const selectedDay = daysOfWeek[currentDayIndex];
 
             useEffect(() => {
-                loadTasks();
+                const todayIndex = daysOfWeek.indexOf(currentDay);
+                if (todayIndex !== -1) {
+                    setCurrentDayIndex(todayIndex);
+                }
             }, []);
 
-            const loadTasks = async () => {
-                try {
-                    const result = await storage.get('weekly-schedule');
-                    if (result) {
-                        setTasks(JSON.parse(result.value));
-                    }
-                } catch (error) {
-                    console.log('No saved schedule found');
-                }
-            };
-
-            const saveTasks = async (updatedTasks) => {
-                try {
-                    await storage.set('weekly-schedule', JSON.stringify(updatedTasks));
-                } catch (error) {
-                    console.error('Failed to save tasks');
-                }
-            };
+            useEffect(() => {
+                localStorage.setItem('weeklyPlannerTasks', JSON.stringify(tasks));
+            }, [tasks]);
 
             const addTask = () => {
-                if (!newTask.title.trim()) return;
+                if (!newTask.title || !newTask.time) return;
                 
-                const dayTasks = tasks[selectedDay] || [];
-                const task = {
-                    id: Date.now(),
-                    title: newTask.title,
-                    time: newTask.time,
-                    description: newTask.description,
-                    completed: false
-                };
+                const taskId = Date.now();
+                setTasks(prev => ({
+                    ...prev,
+                    [selectedDay]: [...(prev[selectedDay] || []), { ...newTask, id: taskId }]
+                }));
                 
-                const updatedTasks = {
-                    ...tasks,
-                    [selectedDay]: [...dayTasks, task].sort((a, b) => 
-                        a.time.localeCompare(b.time)
-                    )
-                };
-                
-                setTasks(updatedTasks);
-                saveTasks(updatedTasks);
                 setNewTask({ title: '', time: '', description: '' });
-                setIsAdding(false);
+                setShowModal(false);
             };
 
-            const deleteTask = (dayId, taskId) => {
-                const updatedTasks = {
-                    ...tasks,
-                    [dayId]: tasks[dayId].filter(t => t.id !== taskId)
-                };
-                setTasks(updatedTasks);
-                saveTasks(updatedTasks);
+            const deleteTask = (day, taskId) => {
+                setTasks(prev => ({
+                    ...prev,
+                    [day]: prev[day].filter(task => task.id !== taskId)
+                }));
             };
 
-            const toggleComplete = (dayId, taskId) => {
-                const updatedTasks = {
-                    ...tasks,
-                    [dayId]: tasks[dayId].map(t => 
-                        t.id === taskId ? { ...t, completed: !t.completed } : t
+            const sortedTasks = (day) => {
+                return (tasks[day] || []).sort((a, b) => a.time.localeCompare(b.time));
+            };
+
+            return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950 p-4 relative overflow-hidden' },
+                // Neon glow effects
+                React.createElement('div', { className: 'absolute top-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-custom' }),
+                React.createElement('div', { className: 'absolute bottom-0 right-1/4 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-custom', style: { animationDelay: '1s' } }),
+                React.createElement('div', { className: 'absolute top-1/2 left-1/2 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-custom', style: { animationDelay: '2s' } }),
+
+                React.createElement('div', { className: 'relative z-10 max-w-4xl mx-auto h-screen flex flex-col' },
+                    // Header
+                    React.createElement('div', { className: 'text-center py-4 md:py-6' },
+                        React.createElement('h1', { className: 'text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 mb-4' }, 'Weekly Planner'),
+                        React.createElement('div', { className: 'flex items-center justify-center gap-1 md:gap-2 flex-wrap px-2' },
+                            daysOfWeek.map((day, index) => 
+                                React.createElement('button', {
+                                    key: day,
+                                    onClick: () => setCurrentDayIndex(index),
+                                    className: `px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
+                                        index === currentDayIndex
+                                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-pink-500/50 scale-105'
+                                            : 'bg-black/30 text-purple-300 hover:bg-black/50 border border-purple-500/30'
+                                    } ${day === currentDay && index !== currentDayIndex ? 'ring-2 ring-pink-400/50' : ''}`
+                                },
+                                    day.slice(0, 3),
+                                    day === currentDay && index !== currentDayIndex && React.createElement('span', { className: 'ml-1 inline-block w-1.5 h-1.5 bg-pink-400 rounded-full' })
+                                )
+                            )
+                        )
+                    ),
+
+                    // Day Title
+                    React.createElement('div', { className: 'text-center mb-6' },
+                        React.createElement('h2', { className: 'text-3xl md:text-4xl font-bold text-white mb-2' }, selectedDay),
+                        selectedDay === currentDay && React.createElement('span', { className: 'inline-block px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm rounded-full shadow-lg shadow-pink-500/50' }, 'Today')
+                    ),
+
+                    // Tasks Container
+                    React.createElement('div', { className: 'flex-1 bg-black/30 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-900/50 p-6 overflow-hidden flex flex-col' },
+                        React.createElement('div', { className: 'flex-1 overflow-y-auto mb-4 space-y-3 pr-2' },
+                            sortedTasks(selectedDay).length === 0 
+                                ? React.createElement('div', { className: 'flex items-center justify-center h-full' },
+                                    React.createElement('p', { className: 'text-purple-300 text-lg' }, 'No tasks yet. Add your first task!')
+                                )
+                                : sortedTasks(selectedDay).map(task =>
+                                    React.createElement('div', {
+                                        key: task.id,
+                                        className: 'p-4 bg-gradient-to-r from-purple-900/50 to-indigo-900/50 backdrop-blur-sm rounded-xl border border-purple-500/40 shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-[1.02]'
+                                    },
+                                        React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                            React.createElement('h3', { className: 'font-semibold text-white text-lg flex-1' }, task.title),
+                                            React.createElement('button', {
+                                                onClick: () => deleteTask(selectedDay, task.id),
+                                                className: 'text-pink-400 hover:text-pink-300 ml-2 transition-colors'
+                                            }, React.createElement(X))
+                                        ),
+                                        React.createElement('div', { className: 'flex items-center text-purple-300 mb-2' },
+                                            React.createElement(Clock),
+                                            React.createElement('span', { className: 'font-medium ml-2' }, task.time)
+                                        ),
+                                        task.description && React.createElement('div', { className: 'flex items-start text-purple-200 mt-3 pt-3 border-t border-purple-500/30' },
+                                            React.createElement(AlignLeft),
+                                            React.createElement('p', { className: 'text-sm ml-2' }, task.description)
+                                        )
+                                    )
+                                )
+                        ),
+
+                        // Add Task Button
+                        React.createElement('button', {
+                            onClick: () => setShowModal(true),
+                            className: 'w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:via-pink-500 hover:to-indigo-500 text-white py-4 px-6 rounded-xl transition-all font-semibold text-lg shadow-lg shadow-pink-500/50'
+                        },
+                            React.createElement(Plus),
+                            'Add Task'
+                        )
                     )
-                };
-                setTasks(updatedTasks);
-                saveTasks(updatedTasks);
-            };
+                ),
 
-            const currentDayTasks = tasks[selectedDay] || [];
-            const completedCount = currentDayTasks.filter(t => t.completed).length;
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="text-center mb-8">
-                            <div className="inline-flex items-center gap-3 mb-3">
-                                <Calendar size={32} />
-                                <h1 className="text-4xl font-bold text-white">Weekly Scheduler</h1>
-                            </div>
-                            <p className="text-purple-300">Plan your week, stay organized</p>
-                        </div>
-
-                        <div className="grid grid-cols-7 gap-2 mb-8">
-                            {days.map(day => {
-                                const dayTaskCount = (tasks[day.id] || []).length;
-                                const isToday = day.id === new Date().getDay();
-                                const isSelected = day.id === selectedDay;
-                                
-                                return (
-                                    <button
-                                        key={day.id}
-                                        onClick={() => setSelectedDay(day.id)}
-                                        className={`relative p-4 rounded-2xl transition-all duration-300 ${
-                                            isSelected
-                                                ? 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/50 scale-105'
-                                                : 'bg-white/10 backdrop-blur-sm hover:bg-white/20'
-                                        }`}
-                                    >
-                                        {isToday && (
-                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-slate-900"></div>
-                                        )}
-                                        <div className="text-white font-bold text-sm mb-1">{day.short}</div>
-                                        {dayTaskCount > 0 && (
-                                            <div className="text-xs text-purple-200 bg-white/20 rounded-full px-2 py-0.5">
-                                                {dayTaskCount}
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/20">
-                            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/20">
-                                <div>
-                                    <h2 className="text-3xl font-bold text-white mb-1">
-                                        {days[selectedDay].name}
-                                    </h2>
-                                    {currentDayTasks.length > 0 && (
-                                        <p className="text-purple-300 text-sm">
-                                            {completedCount} of {currentDayTasks.length} completed
-                                        </p>
-                                    )}
-                                </div>
-                                <button
-                                    onClick={() => setIsAdding(!isAdding)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
-                                >
-                                    <Plus />
-                                    <span className="font-semibold">Add Task</span>
-                                </button>
-                            </div>
-
-                            {isAdding && (
-                                <div className="mb-6 p-4 bg-white/5 rounded-2xl border border-white/10">
-                                    <input
-                                        type="text"
-                                        placeholder="Task title"
-                                        value={newTask.title}
-                                        onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                                        className="w-full px-4 py-3 mb-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    />
-                                    <input
-                                        type="time"
-                                        value={newTask.time}
-                                        onChange={(e) => setNewTask({ ...newTask, time: e.target.value })}
-                                        className="w-full px-4 py-3 mb-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    />
-                                    <textarea
-                                        placeholder="Description (optional)"
-                                        value={newTask.description}
-                                        onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                                        className="w-full px-4 py-3 mb-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                                        rows="2"
-                                    />
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={addTask}
-                                            className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:shadow-lg hover:shadow-green-500/50 transition-all duration-300 font-semibold"
-                                        >
-                                            Save Task
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setIsAdding(false);
-                                                setNewTask({ title: '', time: '', description: '' });
-                                            }}
-                                            className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all duration-300"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="space-y-3">
-                                {currentDayTasks.length === 0 ? (
-                                    <div className="text-center py-12">
-                                        <Calendar size={64} />
-                                        <p className="text-purple-300 text-lg mt-4">No tasks scheduled</p>
-                                        <p className="text-purple-400 text-sm mt-2">Add your first task to get started</p>
-                                    </div>
-                                ) : (
-                                    currentDayTasks.map(task => (
-                                        <div
-                                            key={task.id}
-                                            className={`group p-4 rounded-2xl transition-all duration-300 ${
-                                                task.completed
-                                                    ? 'bg-white/5 border border-green-500/30'
-                                                    : 'bg-white/10 border border-white/20 hover:bg-white/15'
-                                            }`}
-                                        >
-                                            <div className="flex items-start gap-4">
-                                                <button
-                                                    onClick={() => toggleComplete(selectedDay, task.id)}
-                                                    className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                                                        task.completed
-                                                            ? 'bg-green-500 border-green-500'
-                                                            : 'border-purple-400 hover:border-purple-300'
-                                                    }`}
-                                                >
-                                                    {task.completed && <Check />}
-                                                </button>
-                                                
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        {task.time && (
-                                                            <div className="flex items-center gap-1 text-purple-300 text-sm">
-                                                                <Clock />
-                                                                <span>{task.time}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <h3 className={`text-lg font-semibold mb-1 ${
-                                                        task.completed ? 'text-white/50 line-through' : 'text-white'
-                                                    }`}>
-                                                        {task.title}
-                                                    </h3>
-                                                    {task.description && (
-                                                        <p className={`text-sm ${
-                                                            task.completed ? 'text-purple-400/50' : 'text-purple-300'
-                                                        }`}>
-                                                            {task.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-
-                                                <button
-                                                    onClick={() => deleteTask(selectedDay, task.id)}
-                                                    className="flex-shrink-0 p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
-                                                >
-                                                    <Trash2 />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                // Modal
+                showModal && React.createElement('div', { className: 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50' },
+                    React.createElement('div', { className: 'bg-gradient-to-br from-purple-900 via-indigo-900 to-pink-900 rounded-2xl shadow-2xl shadow-purple-500/50 max-w-md w-full p-6 border border-purple-500/50' },
+                        React.createElement('div', { className: 'flex justify-between items-center mb-6' },
+                            React.createElement('h3', { className: 'text-2xl font-bold text-white' }, `Add Task - ${selectedDay}`),
+                            React.createElement('button', {
+                                onClick: () => setShowModal(false),
+                                className: 'text-purple-300 hover:text-white transition-colors'
+                            }, React.createElement(X))
+                        ),
+                        
+                        React.createElement('div', { className: 'space-y-4' },
+                            React.createElement('div', null,
+                                React.createElement('label', { className: 'block text-sm font-medium text-purple-200 mb-2' }, 'Task Title *'),
+                                React.createElement('input', {
+                                    type: 'text',
+                                    value: newTask.title,
+                                    onChange: (e) => setNewTask({ ...newTask, title: e.target.value }),
+                                    className: 'w-full px-4 py-3 bg-black/30 border border-purple-500/50 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-purple-400',
+                                    placeholder: 'Enter task title'
+                                })
+                            ),
+                            
+                            React.createElement('div', null,
+                                React.createElement('label', { className: 'block text-sm font-medium text-purple-200 mb-2' }, 'Time *'),
+                                React.createElement('input', {
+                                    type: 'time',
+                                    value: newTask.time,
+                                    onChange: (e) => setNewTask({ ...newTask, time: e.target.value }),
+                                    className: 'w-full px-4 py-3 bg-black/30 border border-purple-500/50 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white'
+                                })
+                            ),
+                            
+                            React.createElement('div', null,
+                                React.createElement('label', { className: 'block text-sm font-medium text-purple-200 mb-2' }, 'Description (Optional)'),
+                                React.createElement('textarea', {
+                                    value: newTask.description,
+                                    onChange: (e) => setNewTask({ ...newTask, description: e.target.value }),
+                                    className: 'w-full px-4 py-3 bg-black/30 border border-purple-500/50 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white placeholder-purple-400',
+                                    rows: 3,
+                                    placeholder: 'Add task description...'
+                                })
+                            ),
+                            
+                            React.createElement('div', { className: 'flex gap-3 pt-2' },
+                                React.createElement('button', {
+                                    onClick: addTask,
+                                    className: 'flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-3 px-4 rounded-xl transition-all font-semibold shadow-lg shadow-pink-500/50'
+                                }, 'Add Task'),
+                                React.createElement('button', {
+                                    onClick: () => setShowModal(false),
+                                    className: 'flex-1 bg-black/40 hover:bg-black/60 text-purple-200 py-3 px-4 rounded-xl transition-all font-semibold border border-purple-500/50'
+                                }, 'Cancel')
+                            )
+                        )
+                    )
+                )
             );
         }
 
-        ReactDOM.render(<WeekScheduler />, document.getElementById('root'));
+        ReactDOM.render(React.createElement(WeeklyPlanner), document.getElementById('app'));
 
-        // PWA Service Worker Registration
+        // Service Worker Registration
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed'));
-            });
+            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
