@@ -1,4 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Scheduler</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const TIME_SLOTS = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+
+        function WeekScheduler() {
+            const [schedule, setSchedule] = useState({});
+            const [selectedDay, setSelectedDay] = useState('Monday');
+            const [newTask, setNewTask] = useState({ title: '', time: '09:00', category: 'work' });
+            const [saveStatus, setSaveStatus] = useState('');
+
+            const categories = {
+                work: { color: 'bg-blue-500', label: 'Work' },
+                personal: { color: 'bg-purple-500', label: 'Personal' },
+                fitness: { color: 'bg-green-500', label: 'Fitness' },
+                social: { color: 'bg-pink-500', label: 'Social' },
+                other: { color: 'bg-gray-500', label: 'Other' }
+            };
+
+            useEffect(() => {
+                loadSchedule();
+                // Initialize Lucide icons
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, []);
+
+            useEffect(() => {
+                // Re-initialize icons when content changes
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, [schedule, selectedDay, saveStatus]);
+
+            const loadSchedule = () => {
+                try {
+                    const saved = localStorage.getItem('weekly-schedule');
+                    if (saved) {
+                        setSchedule(JSON.parse(saved));
+                    }
+                } catch (error) {
+                    console.log('No saved schedule found');
+                }
+            };
 
             const saveSchedule = (updatedSchedule) => {
                 try {
@@ -222,13 +284,6 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<WeekScheduler />);
-        
-        // Initialize Lucide icons after React renders
-        setTimeout(() => {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }, 100);
     </script>
 </body>
 </html>
