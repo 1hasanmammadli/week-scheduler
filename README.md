@@ -1,2 +1,2 @@
 # week-scheduler
-My weekly task scheduler
+weekly task scheduler
