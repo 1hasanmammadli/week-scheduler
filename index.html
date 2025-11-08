@@ -85,21 +85,26 @@
             }
         };
 
-        function WeekScheduler() {
-            const [tasks, setTasks] = useState({});
-            const [selectedDay, setSelectedDay] = useState(new Date().getDay());
-            const [newTask, setNewTask] = useState({ title: '', time: '', description: '' });
-            const [isAdding, setIsAdding] = useState(false);
+function WeekScheduler() {
+    const getTodayId = () => {
+        const day = new Date().getDay();
+        return day === 0 ? 6 : day - 1;
+    };
 
-            const days = [
-                { id: 0, name: 'Sunday', short: 'Sun' },
-                { id: 1, name: 'Monday', short: 'Mon' },
-                { id: 2, name: 'Tuesday', short: 'Tue' },
-                { id: 3, name: 'Wednesday', short: 'Wed' },
-                { id: 4, name: 'Thursday', short: 'Thu' },
-                { id: 5, name: 'Friday', short: 'Fri' },
-                { id: 6, name: 'Saturday', short: 'Sat' }
-            ];
+    const [tasks, setTasks] = useState({});
+    const [selectedDay, setSelectedDay] = useState(getTodayId());
+    const [newTask, setNewTask] = useState({ title: '', time: '', description: '' });
+    const [isAdding, setIsAdding] = useState(false);
+    
+    const days = [
+        { id: 0, name: 'Monday', short: 'Mon' },
+        { id: 1, name: 'Tuesday', short: 'Tue' },
+        { id: 2, name: 'Wednesday', short: 'Wed' },
+        { id: 3, name: 'Thursday', short: 'Thu' },
+        { id: 4, name: 'Friday', short: 'Fri' },
+        { id: 5, name: 'Saturday', short: 'Sat' },
+        { id: 6, name: 'Sunday', short: 'Sun' }
+    ];
 
             useEffect(() => {
                 loadTasks();
@@ -180,13 +185,13 @@
                                 <Calendar size={32} />
                                 <h1 className="text-4xl font-bold text-white">Weekly Scheduler</h1>
                             </div>
-                            <p className="text-purple-300">Plan your week, stay organized</p>
+                            <p className="text-purple-300">NEVER GIVE UP!</p>
                         </div>
 
                         <div className="grid grid-cols-7 gap-2 mb-8">
                             {days.map(day => {
                                 const dayTaskCount = (tasks[day.id] || []).length;
-                                const isToday = day.id === new Date().getDay();
+                                const isToday = day.id === getTodayId();
                                 const isSelected = day.id === selectedDay;
                                 
                                 return (
